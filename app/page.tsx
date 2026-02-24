@@ -5,9 +5,10 @@ import { Navbar } from "@/components/navbar";
 import { PokerSection } from "@/components/poker/poker-section";
 import { TablesSection } from "@/components/tables/tables-section";
 import { SettingsSection } from "@/components/settings/settings-section";
+import { PlayersSection } from "@/components/players/players-section";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<"poker" | "tables" | "settings">(
+  const [activeTab, setActiveTab] = useState<"players" | "poker" | "tables" | "settings">(
     "poker"
   );
 
@@ -16,6 +17,7 @@ export default function Home() {
       <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="mx-auto max-w-6xl px-4 py-8">
+        {activeTab === "players" && <PlayersSection />}
         {activeTab === "poker" && <PokerSection />}
         {activeTab === "tables" && <TablesSection />}
         {activeTab === "settings" && <SettingsSection />}
