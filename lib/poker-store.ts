@@ -5,6 +5,7 @@ export interface Player {
   name: string;
   rebuys: number;
   tableId: number | null;
+  isEliminated?: boolean;
 }
 
 export interface BlindLevel {
@@ -52,6 +53,7 @@ interface PokerState {
   setPlayers: (players: Player[]) => void;
   addPlayer: (name: string) => void;
   removePlayer: (id: string) => void;
+  eliminatePlayer: (id: string) => void;
   addRebuy: (playerId: string) => void;
   removeRebuy: (playerId: string) => void;
   assignPlayerToTable: (playerId: string, tableId: number | null) => void;
@@ -172,8 +174,15 @@ export const usePokerStore = create<PokerState>((set, get) => ({
     set((state) => ({
       players: [
         ...state.players,
-        { id: crypto.randomUUID(), name, rebuys: 0, tableId: null },
+        { id: crypto.randomUUID(), name, rebuys: 0, tableId: null, isEliminated: false },
       ],
+    })),
+
+  eliminatePlayer: (id) =>
+    set((state) => ({
+      players: state.players.map((player) =>
+        player.id === id ? { ...player, isEliminated: true } : player
+      ),
     })),
 
   removePlayer: (id) =>
@@ -237,6 +246,7 @@ export const usePokerStore = create<PokerState>((set, get) => ({
         ...player,
         rebuys: 0,
         tableId: null,
+        isEliminated: false,
       })),
     })),
 }));
