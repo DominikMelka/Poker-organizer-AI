@@ -1,18 +1,20 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Spade, LayoutGrid, Settings } from "lucide-react";
+import { Spade, LayoutGrid, Users, Settings } from "lucide-react";
 
 interface NavbarProps {
-  activeTab: "poker" | "tables" | "settings";
-  onTabChange: (tab: "poker" | "tables" | "settings") => void;
+  activeTab: "players" | "poker" | "tables" | "settings";
+  onTabChange: (tab: "players" | "poker" | "tables" | "settings") => void;
 }
 
 export function Navbar({ activeTab, onTabChange }: NavbarProps) {
   const tabs = [
     { id: "poker" as const, label: "Poker", icon: Spade },
     { id: "tables" as const, label: "Stoly", icon: LayoutGrid },
+    { id: "players" as const, label: "Hráči", icon: Users },
     { id: "settings" as const, label: "Nastavení", icon: Settings },
+
   ];
 
   return (
