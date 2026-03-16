@@ -2,14 +2,14 @@
 
 import { usePokerStore, type Player } from "@/lib/poker-store";
 import { Button } from "@/components/ui/button";
-import { Users, Plus, Minus, Banknote } from "lucide-react";
+import { Users, Plus, Minus, Banknote, Trash2 } from "lucide-react";
 
 interface TableCardProps {
   tableNumber: number;
 }
 
 export function TableCard({ tableNumber }: TableCardProps) {
-  const { players, buyInAmount, rebuyAmount, addRebuy, removeRebuy } =
+  const { players, buyInAmount, rebuyAmount, addRebuy, removeRebuy, removePlayer } =
     usePokerStore();
 
   const tablePlayers = players.filter((p) => p.tableId === tableNumber);
@@ -60,6 +60,7 @@ export function TableCard({ tableNumber }: TableCardProps) {
                 rebuyAmount={rebuyAmount}
                 onAddRebuy={() => addRebuy(player.id)}
                 onRemoveRebuy={() => removeRebuy(player.id)}
+                onRemovePlayer={() => removePlayer(player.id)}
               />
             ))}
           </div>
@@ -75,6 +76,7 @@ interface PlayerRowProps {
   rebuyAmount: number;
   onAddRebuy: () => void;
   onRemoveRebuy: () => void;
+  onRemovePlayer: () => void;
 }
 
 function PlayerRow({
@@ -83,6 +85,7 @@ function PlayerRow({
   rebuyAmount,
   onAddRebuy,
   onRemoveRebuy,
+  onRemovePlayer,
 }: PlayerRowProps) {
   const totalAmount = buyInAmount + player.rebuys * rebuyAmount;
   const formatCurrency = (amount: number) =>
@@ -128,6 +131,15 @@ function PlayerRow({
           onClick={onAddRebuy}
         >
           <Plus className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 ml-1"
+          onClick={onRemovePlayer}
+          title="Odstranit hráče"
+        >
+          <Trash2 className="h-4 w-4" />
         </Button>
       </div>
     </div>
