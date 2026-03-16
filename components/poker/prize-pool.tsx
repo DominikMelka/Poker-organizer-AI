@@ -4,11 +4,12 @@ import { usePokerStore } from "@/lib/poker-store";
 import { Trophy, Medal } from "lucide-react";
 
 export function PrizePool() {
-  const { players, buyInAmount, rebuyAmount } = usePokerStore();
+  const { players, buyInAmount, rebuyAmount, addonAmount } = usePokerStore();
 
   const totalBuyIns = players.filter((p) => p.tableId !== null).length * buyInAmount;
   const totalRebuys = players.reduce((sum, p) => sum + p.rebuys, 0) * rebuyAmount;
-  const prizePool = totalBuyIns + totalRebuys;
+  const totalAddons = players.filter((p) => p.addon).length * addonAmount;
+  const prizePool = totalBuyIns + totalRebuys + totalAddons;
 
   const firstPlace = Math.round(prizePool * 0.5);
   const secondPlace = Math.round(prizePool * 0.3);

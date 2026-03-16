@@ -12,6 +12,7 @@ export function PlayersSection() {
         removeRebuy,
         buyInAmount,
         rebuyAmount,
+        addonAmount,
     } = usePokerStore();
 
     const formatCurrency = (amount: number) =>
@@ -49,7 +50,7 @@ export function PlayersSection() {
                     ) : (
                         <div className="space-y-3">
                             {activePlayers.map((player) => {
-                                const totalAmount = buyInAmount + player.rebuys * rebuyAmount;
+                                const totalAmount = buyInAmount + player.rebuys * rebuyAmount + (player.addon ? addonAmount : 0);
 
                                 return (
                                     <div
@@ -77,6 +78,11 @@ export function PlayersSection() {
                                                         <Banknote className="w-3.5 h-3.5" />
                                                         {formatCurrency(totalAmount)}
                                                     </span>
+                                                    {player.addon && (
+                                                        <span className="text-primary font-medium flex items-center gap-1">
+                                                            (+Add-on)
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

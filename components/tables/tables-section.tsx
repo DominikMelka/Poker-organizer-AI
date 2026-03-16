@@ -5,13 +5,15 @@ import { TableCard } from "./table-card";
 import { Banknote } from "lucide-react";
 
 export function TablesSection() {
-  const { activeTables, players, buyInAmount, rebuyAmount } = usePokerStore();
+  const { activeTables, players, buyInAmount, rebuyAmount, addonAmount } = usePokerStore();
 
   const totalBuyIns =
     players.filter((p) => p.tableId !== null).length * buyInAmount;
   const totalRebuys =
     players.reduce((sum, p) => sum + p.rebuys, 0) * rebuyAmount;
-  const grandTotal = totalBuyIns + totalRebuys;
+  const totalAddons =
+    players.filter((p) => p.addon).length * addonAmount;
+  const grandTotal = totalBuyIns + totalRebuys + totalAddons;
 
   const formatCurrency = (amount: number) =>
     `${amount.toLocaleString("cs-CZ")} Kč`;
@@ -45,6 +47,13 @@ export function TablesSection() {
               {formatCurrency(rebuyAmount)} ={" "}
               <span className="text-foreground font-medium">
                 {formatCurrency(totalRebuys)}
+              </span>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {players.filter((p) => p.addon).length} add-onů ×{" "}
+              {formatCurrency(addonAmount)} ={" "}
+              <span className="text-foreground font-medium">
+                {formatCurrency(totalAddons)}
               </span>
             </p>
           </div>
