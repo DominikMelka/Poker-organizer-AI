@@ -6,6 +6,7 @@ export interface Player {
   rebuys: number;
   tableId: number | null;
   isEliminated?: boolean;
+  addon?: boolean;
 }
 
 export interface BlindLevel {
@@ -28,6 +29,7 @@ interface PokerState {
   // Buy-in
   buyInAmount: number;
   rebuyAmount: number;
+  addonAmount: number;
 
   // Tables
   activeTables: number;
@@ -48,6 +50,7 @@ interface PokerState {
 
   setBuyInAmount: (amount: number) => void;
   setRebuyAmount: (amount: number) => void;
+  setAddonAmount: (amount: number) => void;
 
   setActiveTables: (count: number) => void;
   setPlayers: (players: Player[]) => void;
@@ -56,6 +59,7 @@ interface PokerState {
   eliminatePlayer: (id: string) => void;
   addRebuy: (playerId: string) => void;
   removeRebuy: (playerId: string) => void;
+  toggleAddon: (playerId: string) => void;
   assignPlayerToTable: (playerId: string, tableId: number | null) => void;
   randomizePlayerAssignment: () => void;
   resetTournament: () => void;
@@ -85,6 +89,7 @@ export const usePokerStore = create<PokerState>((set, get) => ({
 
   buyInAmount: 200,
   rebuyAmount: 200,
+  addonAmount: 200,
 
   activeTables: 3,
   players: [],
@@ -156,6 +161,7 @@ export const usePokerStore = create<PokerState>((set, get) => ({
   // Buy-in actions
   setBuyInAmount: (amount) => set({ buyInAmount: amount }),
   setRebuyAmount: (amount) => set({ rebuyAmount: amount }),
+  setAddonAmount: (amount) => set({ addonAmount: amount }),
 
   // Tables actions
   setActiveTables: (count) => {
@@ -174,7 +180,7 @@ export const usePokerStore = create<PokerState>((set, get) => ({
     set((state) => ({
       players: [
         ...state.players,
-        { id: crypto.randomUUID(), name, rebuys: 0, tableId: null, isEliminated: false },
+        { id: crypto.randomUUID(), name, rebuys: 0, tableId: null, isEliminated: false, addon: false },
       ],
     })),
 
@@ -205,6 +211,13 @@ export const usePokerStore = create<PokerState>((set, get) => ({
         player.id === playerId && player.rebuys > 0
           ? { ...player, rebuys: player.rebuys - 1 }
           : player
+      ),
+    })),
+
+  toggleAddon: (playerId) =>
+    set((state) => ({
+      players: state.players.map((player) =>
+        player.id === playerId ? { ...player, addon: !player.addon } : player
       ),
     })),
 
@@ -247,6 +260,7 @@ export const usePokerStore = create<PokerState>((set, get) => ({
         rebuys: 0,
         tableId: null,
         isEliminated: false,
+        addon: false,
       })),
     })),
 }));

@@ -22,6 +22,7 @@ export function SettingsSection() {
     blindLevels,
     buyInAmount,
     rebuyAmount,
+    addonAmount,
     activeTables,
     players,
     setLevelDuration,
@@ -30,6 +31,7 @@ export function SettingsSection() {
     removeBlindLevel,
     setBuyInAmount,
     setRebuyAmount,
+    setAddonAmount,
     setActiveTables,
     addPlayer,
     removePlayer,
@@ -104,11 +106,11 @@ export function SettingsSection() {
           <div className="flex items-center gap-2 mb-4">
             <Banknote className="w-5 h-5 text-accent" />
             <h2 className="text-lg font-semibold text-foreground">
-              Buy-in & Dokup
+              Buy-in, Dokup & Add-on
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <Label htmlFor="buyIn" className="text-muted-foreground">
                 Buy-in (Kč)
@@ -134,6 +136,20 @@ export function SettingsSection() {
                 step={50}
                 value={rebuyAmount}
                 onChange={(e) => setRebuyAmount(Number.parseInt(e.target.value))}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="addon" className="text-muted-foreground">
+                Add-on (Kč)
+              </Label>
+              <Input
+                id="addon"
+                type="number"
+                min={0}
+                step={50}
+                value={addonAmount}
+                onChange={(e) => setAddonAmount(Number.parseInt(e.target.value))}
                 className="mt-1"
               />
             </div>
