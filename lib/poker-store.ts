@@ -55,6 +55,7 @@ interface PokerState {
   setActiveTables: (count: number) => void;
   setPlayers: (players: Player[]) => void;
   addPlayer: (name: string) => void;
+  addLatePlayer: (name: string) => void;
   removePlayer: (id: string) => void;
   eliminatePlayer: (id: string) => void;
   addRebuy: (playerId: string) => void;
@@ -183,6 +184,31 @@ export const usePokerStore = create<PokerState>((set, get) => ({
         { id: crypto.randomUUID(), name, rebuys: 0, tableId: null, isEliminated: false, addon: false },
       ],
     })),
+
+  addLatePlayer: (name) =>
+    set((state) => {
+      const tableCounts = new Array(state.activeTables).fill(0);
+      state.players.forEach((p) => {
+        if (p.tableId && p.tableId <= state.activeTables && !p.isEliminated) {
+          tableCounts[p.tableId - 1]++;
+        }
+      });
+      let minTableId = 1;
+      let minCount = tableCounts[0] || 0;
+      for (let i = 1; i < state.activeTables; i++) {
+        if ((tableCounts[i] || 0) < minCount) {
+          minCount = tableCounts[i] || 0;
+          minTableId = i + 1;
+        }
+      }
+
+      return {
+        players: [
+          ...state.players,
+          { id: crypto.randomUUID(), name, rebuys: 0, tableId: minTableId, isEliminated: false, addon: false },
+        ],
+      };
+    }),
 
   eliminatePlayer: (id) =>
     set((state) => ({
