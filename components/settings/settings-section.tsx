@@ -40,7 +40,6 @@ export function SettingsSection() {
   } = usePokerStore();
 
   const [newPlayerName, setNewPlayerName] = useState("");
-  const [bulkPlayersText, setBulkPlayersText] = useState("");
 
   const handleAddPlayer = () => {
     if (newPlayerName.trim()) {
@@ -56,15 +55,6 @@ export function SettingsSection() {
     }
   };
 
-  const handleBulkAddPlayers = () => {
-    const names = bulkPlayersText
-      .split("\n")
-      .map((name) => name.trim())
-      .filter((name) => name.length > 0);
-
-    names.forEach((name) => addPlayer(name));
-    setBulkPlayersText("");
-  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -295,27 +285,6 @@ export function SettingsSection() {
             </div>
           </div>
 
-          {/* Bulk add players */}
-          <div className="mb-4">
-            <Label className="text-muted-foreground text-sm">
-              Hromadné přidání (jedno jméno na řádek)
-            </Label>
-            <textarea
-              className="mt-1 w-full h-24 rounded-lg bg-input border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-              placeholder={"Jan\nPetr\nMarie\n..."}
-              value={bulkPlayersText}
-              onChange={(e) => setBulkPlayersText(e.target.value)}
-            />
-            <Button
-              variant="secondary"
-              size="sm"
-              className="mt-2"
-              onClick={handleBulkAddPlayers}
-              disabled={!bulkPlayersText.trim()}
-            >
-              Přidat všechny
-            </Button>
-          </div>
 
           {/* Players list */}
           <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
