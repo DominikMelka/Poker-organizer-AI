@@ -1,4 +1,3 @@
-// Module-level singleton — persists for the entire page lifetime
 let audioElement: HTMLAudioElement | null = null;
 
 function createBeepAudio(): HTMLAudioElement {
@@ -28,7 +27,6 @@ function createBeepAudio(): HTMLAudioElement {
 
     for (let i = 0; i < numSamples; i++) {
         const t = i / sampleRate;
-        // 3 beeps: 0–0.35s, 0.6–0.95s, 1.2–2.0s
         const inBeep =
             (t >= 0 && t < 0.35) || (t >= 0.6 && t < 0.95) || (t >= 1.2 && t < 2.0);
         const sample = inBeep ? Math.sin(2 * Math.PI * frequency * t) * 0.7 * 32767 : 0;
@@ -42,7 +40,6 @@ function createBeepAudio(): HTMLAudioElement {
     return audio;
 }
 
-/** Call during a user gesture (e.g. Start button click) to unlock the audio element. */
 export function unlockAudio() {
     if (typeof window === "undefined") return;
     if (!audioElement) audioElement = createBeepAudio();
@@ -55,7 +52,6 @@ export function unlockAudio() {
         .catch(() => { });
 }
 
-/** Play the 3-pulse beep. Works without user gesture after unlockAudio() was called once. */
 export function playBeep() {
     if (typeof window === "undefined") return;
     if (!audioElement) audioElement = createBeepAudio();

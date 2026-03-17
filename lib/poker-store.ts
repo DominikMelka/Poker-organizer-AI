@@ -17,25 +17,20 @@ export interface BlindLevel {
 }
 
 interface PokerState {
-  // Timer
-  levelDuration: number; // in seconds
+  levelDuration: number;
   timeRemaining: number;
   isRunning: boolean;
   currentLevel: number;
 
-  // Blinds
   blindLevels: BlindLevel[];
 
-  // Buy-in
   buyInAmount: number;
   rebuyAmount: number;
   addonAmount: number;
 
-  // Tables
   activeTables: number;
   players: Player[];
 
-  // Actions
   setLevelDuration: (duration: number) => void;
   setTimeRemaining: (time: number) => void;
   toggleTimer: () => void;
@@ -67,21 +62,20 @@ interface PokerState {
 }
 
 const defaultBlindLevels: BlindLevel[] = [
-  { id: "1", level: 1, smallBlind: 25, bigBlind: 50 },
-  { id: "2", level: 2, smallBlind: 50, bigBlind: 100 },
-  { id: "3", level: 3, smallBlind: 75, bigBlind: 150 },
-  { id: "4", level: 4, smallBlind: 100, bigBlind: 200 },
-  { id: "5", level: 5, smallBlind: 150, bigBlind: 300 },
-  { id: "6", level: 6, smallBlind: 200, bigBlind: 400 },
-  { id: "7", level: 7, smallBlind: 300, bigBlind: 600 },
-  { id: "8", level: 8, smallBlind: 400, bigBlind: 800 },
-  { id: "9", level: 9, smallBlind: 500, bigBlind: 1000 },
-  { id: "10", level: 10, smallBlind: 600, bigBlind: 1200 },
+  { id: "1", level: 1, smallBlind: 50, bigBlind: 100 },
+  { id: "2", level: 2, smallBlind: 100, bigBlind: 200 },
+  { id: "3", level: 3, smallBlind: 150, bigBlind: 300 },
+  { id: "4", level: 4, smallBlind: 200, bigBlind: 400 },
+  { id: "5", level: 5, smallBlind: 300, bigBlind: 600 },
+  { id: "6", level: 6, smallBlind: 400, bigBlind: 800 },
+  { id: "7", level: 7, smallBlind: 500, bigBlind: 1000 },
+  { id: "8", level: 8, smallBlind: 800, bigBlind: 1600 },
+  { id: "9", level: 9, smallBlind: 1000, bigBlind: 2000 },
+  { id: "10", level: 10, smallBlind: 2000, bigBlind: 4000 },
 ];
 
 export const usePokerStore = create<PokerState>((set, get) => ({
-  // Initial state
-  levelDuration: 20 * 60, // 20 minutes in seconds
+  levelDuration: 20 * 60,
   timeRemaining: 20 * 60,
   isRunning: false,
   currentLevel: 1,
@@ -95,7 +89,6 @@ export const usePokerStore = create<PokerState>((set, get) => ({
   activeTables: 3,
   players: [],
 
-  // Timer actions
   setLevelDuration: (duration) =>
     set({ levelDuration: duration, timeRemaining: duration }),
 
@@ -130,7 +123,6 @@ export const usePokerStore = create<PokerState>((set, get) => ({
       };
     }),
 
-  // Blinds actions
   setBlindLevels: (levels) => set({ blindLevels: levels }),
 
   addBlindLevel: () =>
@@ -159,12 +151,10 @@ export const usePokerStore = create<PokerState>((set, get) => ({
         .map((level, index) => ({ ...level, level: index + 1 })),
     })),
 
-  // Buy-in actions
   setBuyInAmount: (amount) => set({ buyInAmount: amount }),
   setRebuyAmount: (amount) => set({ rebuyAmount: amount }),
   setAddonAmount: (amount) => set({ addonAmount: amount }),
 
-  // Tables actions
   setActiveTables: (count) => {
     set((state) => ({
       activeTables: count,

@@ -20,7 +20,6 @@ export function TablesSection() {
 
   return (
     <div className="space-y-6">
-      {/* Summary */}
       <div className="rounded-2xl bg-card border border-border p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -60,7 +59,6 @@ export function TablesSection() {
         </div>
       </div>
 
-      {/* Tables Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {Array.from({ length: activeTables }, (_, i) => i + 1).map(
           (tableNumber) => (
