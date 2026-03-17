@@ -34,6 +34,7 @@ export function SettingsSection() {
     setAddonAmount,
     setActiveTables,
     addPlayer,
+    addLatePlayer,
     removePlayer,
     randomizePlayerAssignment,
   } = usePokerStore();
@@ -44,6 +45,13 @@ export function SettingsSection() {
   const handleAddPlayer = () => {
     if (newPlayerName.trim()) {
       addPlayer(newPlayerName.trim());
+      setNewPlayerName("");
+    }
+  };
+
+  const handleAddLatePlayer = () => {
+    if (newPlayerName.trim()) {
+      addLatePlayer(newPlayerName.trim());
       setNewPlayerName("");
     }
   };
@@ -268,16 +276,23 @@ export function SettingsSection() {
           </div>
 
           {/* Add single player */}
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex flex-col sm:flex-row items-center gap-2 mb-4">
             <Input
               placeholder="Jméno hráče"
               value={newPlayerName}
               onChange={(e) => setNewPlayerName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAddPlayer()}
+              className="flex-1"
             />
-            <Button onClick={handleAddPlayer} disabled={!newPlayerName.trim()}>
-              <Plus className="w-4 h-4" />
-            </Button>
+            <div className="flex w-full sm:w-auto items-center gap-2">
+              <Button onClick={handleAddPlayer} disabled={!newPlayerName.trim()} title="Přidat do seznamu" className="flex-1 sm:flex-none">
+                <Plus className="w-4 h-4 sm:mr-0" />
+                <span className="sm:hidden ml-2">Přidat do seznamu</span>
+              </Button>
+              <Button onClick={handleAddLatePlayer} disabled={!newPlayerName.trim()} variant="secondary" title="Přidat a rovnou usadit ke stolu" className="flex-1 sm:flex-none">
+                Usadit ke stolu
+              </Button>
+            </div>
           </div>
 
           {/* Bulk add players */}
