@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePokerStore } from "@/lib/poker-store";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, RefreshCcw } from "lucide-react";
+import { unlockAudio } from "@/lib/timer-audio";
 
 export function Timer() {
   const {
@@ -22,7 +23,6 @@ export function Timer() {
     currentLevel,
     blindLevels,
     levelDuration,
-    setTimeRemaining,
     toggleTimer,
     resetTimer,
     nextLevel,
@@ -32,39 +32,10 @@ export function Timer() {
 
   const [showResetDialog, setShowResetDialog] = useState(false);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isRunning && timeRemaining > 0) {
-      interval = setInterval(() => {
-        setTimeRemaining(timeRemaining - 1);
-      }, 1000);
-    } else if (isRunning && timeRemaining === 0) {
-      // Auto advance to next level
-      if (currentLevel < blindLevels.length) {
-        nextLevel();
-      } else {
-        toggleTimer();
-      }
-    }
-
-    return () => clearInterval(interval);
-  }, [
-    isRunning,
-    timeRemaining,
-    currentLevel,
-    blindLevels.length,
-    setTimeRemaining,
-    nextLevel,
-    toggleTimer,
-  ]);
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const progressPercentage = ((levelDuration - timeRemaining) / levelDuration) * 100;
@@ -108,7 +79,7 @@ export function Timer() {
           </Button>
 
           <Button
-            onClick={toggleTimer}
+            onClick={() => { unlockAudio(); toggleTimer(); }}
             size="lg"
             className="h-14 w-32 text-lg font-semibold"
           >
