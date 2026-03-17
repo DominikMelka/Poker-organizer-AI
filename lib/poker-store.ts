@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export interface Player {
   id: string;
@@ -74,209 +75,217 @@ const defaultBlindLevels: BlindLevel[] = [
   { id: "10", level: 10, smallBlind: 2000, bigBlind: 4000 },
 ];
 
-export const usePokerStore = create<PokerState>((set, get) => ({
-  levelDuration: 20 * 60,
-  timeRemaining: 20 * 60,
-  isRunning: false,
-  currentLevel: 1,
-
-  blindLevels: defaultBlindLevels,
-
-  buyInAmount: 200,
-  rebuyAmount: 200,
-  addonAmount: 200,
-
-  activeTables: 3,
-  players: [],
-
-  setLevelDuration: (duration) =>
-    set({ levelDuration: duration, timeRemaining: duration }),
-
-  setTimeRemaining: (time) => set({ timeRemaining: time }),
-
-  toggleTimer: () => set((state) => ({ isRunning: !state.isRunning })),
-
-  resetTimer: () =>
-    set((state) => ({
-      timeRemaining: state.levelDuration,
-      isRunning: false,
-    })),
-
-  nextLevel: () =>
-    set((state) => {
-      const newLevel = Math.min(
-        state.currentLevel + 1,
-        state.blindLevels.length
-      );
-      return {
-        currentLevel: newLevel,
-        timeRemaining: state.levelDuration,
-      };
-    }),
-
-  previousLevel: () =>
-    set((state) => {
-      const newLevel = Math.max(state.currentLevel - 1, 1);
-      return {
-        currentLevel: newLevel,
-        timeRemaining: state.levelDuration,
-      };
-    }),
-
-  setBlindLevels: (levels) => set({ blindLevels: levels }),
-
-  addBlindLevel: () =>
-    set((state) => {
-      const lastLevel = state.blindLevels[state.blindLevels.length - 1];
-      const newLevel: BlindLevel = {
-        id: crypto.randomUUID(),
-        level: state.blindLevels.length + 1,
-        smallBlind: lastLevel ? lastLevel.bigBlind : 100,
-        bigBlind: lastLevel ? lastLevel.bigBlind * 2 : 200,
-      };
-      return { blindLevels: [...state.blindLevels, newLevel] };
-    }),
-
-  updateBlindLevel: (id, smallBlind, bigBlind) =>
-    set((state) => ({
-      blindLevels: state.blindLevels.map((level) =>
-        level.id === id ? { ...level, smallBlind, bigBlind } : level
-      ),
-    })),
-
-  removeBlindLevel: (id) =>
-    set((state) => ({
-      blindLevels: state.blindLevels
-        .filter((level) => level.id !== id)
-        .map((level, index) => ({ ...level, level: index + 1 })),
-    })),
-
-  setBuyInAmount: (amount) => set({ buyInAmount: amount }),
-  setRebuyAmount: (amount) => set({ rebuyAmount: amount }),
-  setAddonAmount: (amount) => set({ addonAmount: amount }),
-
-  setActiveTables: (count) => {
-    set((state) => ({
-      activeTables: count,
-      players: state.players.map((player) => ({
-        ...player,
-        tableId: player.tableId && player.tableId > count ? null : player.tableId,
-      })),
-    }));
-  },
-
-  setPlayers: (players) => set({ players }),
-
-  addPlayer: (name) =>
-    set((state) => ({
-      players: [
-        ...state.players,
-        { id: crypto.randomUUID(), name, rebuys: 0, tableId: null, isEliminated: false, addon: false },
-      ],
-    })),
-
-  addLatePlayer: (name) =>
-    set((state) => {
-      const tableCounts = new Array(state.activeTables).fill(0);
-      state.players.forEach((p) => {
-        if (p.tableId && p.tableId <= state.activeTables && !p.isEliminated) {
-          tableCounts[p.tableId - 1]++;
-        }
-      });
-      let minTableId = 1;
-      let minCount = tableCounts[0] || 0;
-      for (let i = 1; i < state.activeTables; i++) {
-        if ((tableCounts[i] || 0) < minCount) {
-          minCount = tableCounts[i] || 0;
-          minTableId = i + 1;
-        }
-      }
-
-      return {
-        players: [
-          ...state.players,
-          { id: crypto.randomUUID(), name, rebuys: 0, tableId: minTableId, isEliminated: false, addon: false },
-        ],
-      };
-    }),
-
-  eliminatePlayer: (id) =>
-    set((state) => ({
-      players: state.players.map((player) =>
-        player.id === id ? { ...player, isEliminated: true } : player
-      ),
-    })),
-
-  removePlayer: (id) =>
-    set((state) => ({
-      players: state.players.filter((player) => player.id !== id),
-    })),
-
-  addRebuy: (playerId) =>
-    set((state) => ({
-      players: state.players.map((player) =>
-        player.id === playerId
-          ? { ...player, rebuys: player.rebuys + 1 }
-          : player
-      ),
-    })),
-
-  removeRebuy: (playerId) =>
-    set((state) => ({
-      players: state.players.map((player) =>
-        player.id === playerId && player.rebuys > 0
-          ? { ...player, rebuys: player.rebuys - 1 }
-          : player
-      ),
-    })),
-
-  toggleAddon: (playerId) =>
-    set((state) => ({
-      players: state.players.map((player) =>
-        player.id === playerId ? { ...player, addon: !player.addon } : player
-      ),
-    })),
-
-  assignPlayerToTable: (playerId, tableId) =>
-    set((state) => ({
-      players: state.players.map((player) =>
-        player.id === playerId ? { ...player, tableId } : player
-      ),
-    })),
-
-  randomizePlayerAssignment: () =>
-    set((state) => {
-      const { players, activeTables } = state;
-      const shuffled = [...players].sort(() => Math.random() - 0.5);
-      const maxPlayersPerTable = 9;
-
-      const assigned = shuffled.map((player, index) => {
-        const tableIndex = index % activeTables;
-        const playersAtTable = shuffled
-          .slice(0, index)
-          .filter((_, i) => i % activeTables === tableIndex).length;
-
-        if (playersAtTable >= maxPlayersPerTable) {
-          return { ...player, tableId: null };
-        }
-
-        return { ...player, tableId: tableIndex + 1 };
-      });
-
-      return { players: assigned };
-    }),
-
-  resetTournament: () =>
-    set((state) => ({
-      timeRemaining: state.levelDuration,
+export const usePokerStore = create<PokerState>()(
+  persist(
+    (set, get) => ({
+      levelDuration: 20 * 60,
+      timeRemaining: 20 * 60,
       isRunning: false,
       currentLevel: 1,
-      players: state.players.map((player) => ({
-        ...player,
-        rebuys: 0,
-        tableId: null,
-        isEliminated: false,
-        addon: false,
-      })),
-    })),
-}));
+
+      blindLevels: defaultBlindLevels,
+
+      buyInAmount: 200,
+      rebuyAmount: 200,
+      addonAmount: 200,
+
+      activeTables: 3,
+      players: [],
+
+      setLevelDuration: (duration) =>
+        set({ levelDuration: duration, timeRemaining: duration }),
+
+      setTimeRemaining: (time) => set({ timeRemaining: time }),
+
+      toggleTimer: () => set((state) => ({ isRunning: !state.isRunning })),
+
+      resetTimer: () =>
+        set((state) => ({
+          timeRemaining: state.levelDuration,
+          isRunning: false,
+        })),
+
+      nextLevel: () =>
+        set((state) => {
+          const newLevel = Math.min(
+            state.currentLevel + 1,
+            state.blindLevels.length
+          );
+          return {
+            currentLevel: newLevel,
+            timeRemaining: state.levelDuration,
+          };
+        }),
+
+      previousLevel: () =>
+        set((state) => {
+          const newLevel = Math.max(state.currentLevel - 1, 1);
+          return {
+            currentLevel: newLevel,
+            timeRemaining: state.levelDuration,
+          };
+        }),
+
+      setBlindLevels: (levels) => set({ blindLevels: levels }),
+
+      addBlindLevel: () =>
+        set((state) => {
+          const lastLevel = state.blindLevels[state.blindLevels.length - 1];
+          const newLevel: BlindLevel = {
+            id: crypto.randomUUID(),
+            level: state.blindLevels.length + 1,
+            smallBlind: lastLevel ? lastLevel.bigBlind : 100,
+            bigBlind: lastLevel ? lastLevel.bigBlind * 2 : 200,
+          };
+          return { blindLevels: [...state.blindLevels, newLevel] };
+        }),
+
+      updateBlindLevel: (id, smallBlind, bigBlind) =>
+        set((state) => ({
+          blindLevels: state.blindLevels.map((level) =>
+            level.id === id ? { ...level, smallBlind, bigBlind } : level
+          ),
+        })),
+
+      removeBlindLevel: (id) =>
+        set((state) => ({
+          blindLevels: state.blindLevels
+            .filter((level) => level.id !== id)
+            .map((level, index) => ({ ...level, level: index + 1 })),
+        })),
+
+      setBuyInAmount: (amount) => set({ buyInAmount: amount }),
+      setRebuyAmount: (amount) => set({ rebuyAmount: amount }),
+      setAddonAmount: (amount) => set({ addonAmount: amount }),
+
+      setActiveTables: (count) => {
+        set((state) => ({
+          activeTables: count,
+          players: state.players.map((player) => ({
+            ...player,
+            tableId: player.tableId && player.tableId > count ? null : player.tableId,
+          })),
+        }));
+      },
+
+      setPlayers: (players) => set({ players }),
+
+      addPlayer: (name) =>
+        set((state) => ({
+          players: [
+            ...state.players,
+            { id: crypto.randomUUID(), name, rebuys: 0, tableId: null, isEliminated: false, addon: false },
+          ],
+        })),
+
+      addLatePlayer: (name) =>
+        set((state) => {
+          const tableCounts = new Array(state.activeTables).fill(0);
+          state.players.forEach((p) => {
+            if (p.tableId && p.tableId <= state.activeTables && !p.isEliminated) {
+              tableCounts[p.tableId - 1]++;
+            }
+          });
+          let minTableId = 1;
+          let minCount = tableCounts[0] || 0;
+          for (let i = 1; i < state.activeTables; i++) {
+            if ((tableCounts[i] || 0) < minCount) {
+              minCount = tableCounts[i] || 0;
+              minTableId = i + 1;
+            }
+          }
+
+          return {
+            players: [
+              ...state.players,
+              { id: crypto.randomUUID(), name, rebuys: 0, tableId: minTableId, isEliminated: false, addon: false },
+            ],
+          };
+        }),
+
+      eliminatePlayer: (id) =>
+        set((state) => ({
+          players: state.players.map((player) =>
+            player.id === id ? { ...player, isEliminated: true } : player
+          ),
+        })),
+
+      removePlayer: (id) =>
+        set((state) => ({
+          players: state.players.filter((player) => player.id !== id),
+        })),
+
+      addRebuy: (playerId) =>
+        set((state) => ({
+          players: state.players.map((player) =>
+            player.id === playerId
+              ? { ...player, rebuys: player.rebuys + 1 }
+              : player
+          ),
+        })),
+
+      removeRebuy: (playerId) =>
+        set((state) => ({
+          players: state.players.map((player) =>
+            player.id === playerId && player.rebuys > 0
+              ? { ...player, rebuys: player.rebuys - 1 }
+              : player
+          ),
+        })),
+
+      toggleAddon: (playerId) =>
+        set((state) => ({
+          players: state.players.map((player) =>
+            player.id === playerId ? { ...player, addon: !player.addon } : player
+          ),
+        })),
+
+      assignPlayerToTable: (playerId, tableId) =>
+        set((state) => ({
+          players: state.players.map((player) =>
+            player.id === playerId ? { ...player, tableId } : player
+          ),
+        })),
+
+      randomizePlayerAssignment: () =>
+        set((state) => {
+          const { players, activeTables } = state;
+          const shuffled = [...players].sort(() => Math.random() - 0.5);
+          const maxPlayersPerTable = 9;
+
+          const assigned = shuffled.map((player, index) => {
+            const tableIndex = index % activeTables;
+            const playersAtTable = shuffled
+              .slice(0, index)
+              .filter((_, i) => i % activeTables === tableIndex).length;
+
+            if (playersAtTable >= maxPlayersPerTable) {
+              return { ...player, tableId: null };
+            }
+
+            return { ...player, tableId: tableIndex + 1 };
+          });
+
+          return { players: assigned };
+        }),
+
+      resetTournament: () =>
+        set((state) => ({
+          timeRemaining: state.levelDuration,
+          isRunning: false,
+          currentLevel: 1,
+          players: state.players.map((player) => ({
+            ...player,
+            rebuys: 0,
+            tableId: null,
+            isEliminated: false,
+            addon: false,
+          })),
+        })),
+    }),
+    {
+      name: "poker-organizer-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
