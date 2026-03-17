@@ -55,7 +55,6 @@ export function SettingsSection() {
     }
   };
 
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     return `${mins} min`;
@@ -63,9 +62,7 @@ export function SettingsSection() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Timer & Blinds Settings */}
       <div className="space-y-6">
-        {/* Level Duration */}
         <div className="rounded-2xl bg-card border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
             <Clock className="w-5 h-5 text-primary" />
@@ -99,7 +96,6 @@ export function SettingsSection() {
           </div>
         </div>
 
-        {/* Buy-in Settings */}
         <div className="rounded-2xl bg-card border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
             <Banknote className="w-5 h-5 text-accent" />
@@ -154,7 +150,6 @@ export function SettingsSection() {
           </div>
         </div>
 
-        {/* Blinds Structure */}
         <div className="rounded-2xl bg-card border border-border p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -220,9 +215,7 @@ export function SettingsSection() {
         </div>
       </div>
 
-      {/* Tables & Players Settings */}
       <div className="space-y-6">
-        {/* Active Tables */}
         <div className="rounded-2xl bg-card border border-border p-6">
           <div className="flex items-center gap-2 mb-4">
             <LayoutGrid className="w-5 h-5 text-primary" />
@@ -245,7 +238,6 @@ export function SettingsSection() {
           </div>
         </div>
 
-        {/* Players Management */}
         <div className="rounded-2xl bg-card border border-border p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -265,7 +257,6 @@ export function SettingsSection() {
             </Button>
           </div>
 
-          {/* Add single player */}
           <div className="flex flex-col sm:flex-row items-center gap-2 mb-4">
             <Input
               placeholder="Jméno hráče"
@@ -286,7 +277,6 @@ export function SettingsSection() {
           </div>
 
 
-          {/* Players list */}
           <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
             {players.length === 0 ? (
               <p className="text-center text-muted-foreground py-4">

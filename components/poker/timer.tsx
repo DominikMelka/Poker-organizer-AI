@@ -42,7 +42,6 @@ export function Timer() {
 
   return (
     <div className="relative overflow-hidden rounded-2xl bg-card border border-border p-8">
-      {/* Progress bar background */}
       <div
         className="absolute inset-0 bg-primary/10 transition-all duration-1000"
         style={{ width: `${progressPercentage}%` }}
@@ -62,20 +61,20 @@ export function Timer() {
           <Button
             variant="secondary"
             size="icon"
-            onClick={previousLevel}
-            disabled={currentLevel <= 1}
+            onClick={resetTimer}
             className="h-12 w-12"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <RotateCcw className="h-5 w-5" />
           </Button>
 
           <Button
             variant="secondary"
             size="icon"
-            onClick={resetTimer}
+            onClick={previousLevel}
+            disabled={currentLevel <= 1}
             className="h-12 w-12"
           >
-            <RotateCcw className="h-5 w-5" />
+            <ChevronLeft className="h-6 w-6" />
           </Button>
 
           <Button

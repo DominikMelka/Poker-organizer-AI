@@ -25,7 +25,6 @@ export default function Home() {
 
   const beepPlayedRef = useRef(false);
 
-  // Persistent countdown — runs regardless of which tab is active
   useEffect(() => {
     if (!isRunning) return;
 
@@ -36,7 +35,6 @@ export default function Home() {
       }, 1000);
       return () => clearInterval(id);
     } else {
-      // Timer reached 0 — play beep once and advance level after 2s
       if (!beepPlayedRef.current) {
         beepPlayedRef.current = true;
         playBeep();
