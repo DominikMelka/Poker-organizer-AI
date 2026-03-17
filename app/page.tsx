@@ -12,6 +12,11 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"poker" | "tables" | "settings">(
     "poker"
   );
+  const [hasHydrated, setHasHydrated] = useState(false);
+
+  useEffect(() => {
+    setHasHydrated(true);
+  }, []);
 
   const {
     isRunning,
@@ -49,6 +54,14 @@ export default function Home() {
       return () => clearTimeout(id);
     }
   }, [isRunning, timeRemaining, currentLevel, blindLevels.length, setTimeRemaining, nextLevel, toggleTimer]);
+
+  if (!hasHydrated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground animate-pulse text-lg">Načítám turnaj...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
